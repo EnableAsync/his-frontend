@@ -1,7 +1,7 @@
 <template>
   <v-container>
     <v-card class="mt-2">
-      <v-card-title>已挂号
+      <v-card-title>已缴费
         <v-spacer/>
         <v-text-field
             v-model="search"
@@ -24,7 +24,7 @@
       >
         <template v-slot:item.actions="{ item }">
           <v-icon small @click="deleteItem(item)">
-            mdi-delete
+            send
           </v-icon>
         </template>
       </v-data-table>
@@ -33,41 +33,15 @@
 </template>
 
 <script>
-  import {delRecord} from "../../api/registrar";
-  import {getRegisterRecords} from "../../api/registrar";
-  import {notify} from "../../components/notification";
-
   export default {
-    name: "RegisterBack",
+    name: "Send",
     created() {
-      this.initRecords();
+      this.desserts.map((value => value.genders ? value.genders = '男' : value.genders = '女'))
     },
     methods: {
-      initRecords() {
-        getRegisterRecords()
-          .then(res => {
-            if (res.status !== 200) {
-              notify('fail', res.data.msg);
-              return
-            }
-            this.desserts = res.data.data;
-            this.desserts.map((value => value.genders ? value.genders = '男' : value.genders = '女'))
-          })
-      },
       deleteItem(item) {
         const index = this.desserts.indexOf(item);
-        if (index === -1) {
-          return
-        }
-        const id = item.id;
-        confirm('确认退号？') &&
-        delRecord(id)
-          .then(res => {
-            if (res.status === 200) {
-              notify('success', '退号成功');
-              this.initRecords();
-            }
-          })
+        confirm('确认发药？') && this.desserts.splice(index, 1)
       },
     },
     data: () => ({
@@ -78,15 +52,33 @@
         showFirstLastPage: true
       },
       headers: [
-        // sortable: false
-        {text: 'ID', align: 'start', value: 'id',},
-        {text: '病历号', value: 'medical_id'},
+        {
+          text: '病历号',
+          align: 'start',
+          // sortable: false,
+          value: 'medical_id',
+        },
         {text: '姓名', value: 'name'},
         {text: '性别', value: 'genders'},
-        {text: '生日', value: 'birthday'},
         {text: '操作', value: 'actions', sortable: false},
       ],
-      desserts: []
+      desserts: [
+        {
+          medical_id: '1',
+          name: '张三',
+          genders: 1
+        },
+        {
+          medical_id: '1',
+          name: '李四',
+          genders: 1
+        },
+        {
+          medical_id: '1',
+          name: '王五',
+          genders: 1
+        }
+      ]
     })
   }
 </script>
