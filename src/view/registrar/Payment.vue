@@ -33,15 +33,39 @@
 </template>
 
 <script>
+  import {pay} from "../../api/registrar";
+  import {getNeedPay} from "../../api/registrar";
+  import {notify} from "../../components/notification";
+
   export default {
     name: "Payment",
     created() {
-      this.desserts.map((value => value.genders ? value.genders = '男' : value.genders = '女'))
+      this.initPay();
     },
     methods: {
+      initPay() {
+        getNeedPay()
+          .then(res => {
+            if (res.status === 200) {
+              this.desserts = res.data.data;
+            }
+          }).catch();
+        this.desserts.map((value => value.genders ? value.genders = '男' : value.genders = '女'))
+      },
       deleteItem(item) {
         const index = this.desserts.indexOf(item);
-        confirm('确认缴费？') && this.desserts.splice(index, 1)
+        if (index === -1) {
+          return
+        }
+        const id = item.prescription_id;
+        confirm('确认缴费？') &&
+        pay({pres_id: id})
+          .then(res => {
+            if (res.status === 200) {
+              notify('success', '缴费成功');
+              this.initPay();
+            }
+          })
       },
     },
     data: () => ({
@@ -52,32 +76,11 @@
         showFirstLastPage: true
       },
       headers: [
-        {
-          text: '病历号',
-          align: 'start',
-          // sortable: false,
-          value: 'medical_id',
-        },
-        {text: '姓名', value: 'name'},
-        {text: '性别', value: 'genders'},
+        {text: '处方号', align: 'start', value: 'prescription_id',},
         {text: '操作', value: 'actions', sortable: false},
       ],
       desserts: [
-        {
-          medical_id: '1',
-          name: '张三',
-          genders: 1
-        },
-        {
-          medical_id: '1',
-          name: '李四',
-          genders: 1
-        },
-        {
-          medical_id: '1',
-          name: '王五',
-          genders: 1
-        }
+        {prescription_id: 0}
       ]
     })
   }

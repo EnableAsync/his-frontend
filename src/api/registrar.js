@@ -29,3 +29,33 @@ export function getDoctors() {
     method: 'GET',
   })
 }
+
+export function getNeedPay() {
+  return axios({
+    url: `${URL}pay`,
+    method: 'GET',
+  })
+}
+
+export function pay(data) {
+  return axios({
+    url: `${URL}pay`,
+    method: 'POST',
+    data: data,
+  })
+}
+
+export function getNeedSend() {
+  return axios({
+    url: `${URL}send`,
+    method: 'GET',
+  })
+}
+
+export function sendDrug(data) {
+  return axios({
+    url: `${URL}send`,
+    method: 'POST',
+    data: data,
+  })
+}
